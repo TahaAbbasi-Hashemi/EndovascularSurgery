@@ -28,99 +28,53 @@
 #include <vtkMatrix4x4.h>
 #include <vtkCamera.h>
 
+#include <vtkTriangle.h>
+#include <vtkActor.h>
+#include <vtkCellArray.h>
+#include <vtkNamedColors.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <vtkTriangle.h>
 
 //Eigen
 #include <Eigen/Dense>
 
-//Structures for TDCR and CTCR Visualizations
-
-struct TDCRVis {
-    // disks
-    std::vector<vtkSmartPointer<vtkActor>> disks;
-    
-    //backbone
-    std::vector<vtkSmartPointer<vtkLineSource>> backbone_lines;
-    std::vector<vtkSmartPointer<vtkActor>> backbone_actors;
-
-    // tendons
-    std::vector<std::vector<vtkSmartPointer<vtkLineSource>>> tendon_lines;
-    std::vector<std::vector<vtkSmartPointer<vtkActor>>> tendon_actors;
-    
-    // coordinate system for end-effector
-    vtkSmartPointer<vtkAxesActor> axes_ee;
-    vtkSmartPointer<vtkAxesActor> axes_base;
-    
-    // routing information
-    std::vector<Eigen::Vector3d> routing;
-    
-    // disks per segment
-    int disks_per_seg;
-};
-
-struct CTCRVis {
-    // tubes
-    std::vector<std::vector<vtkSmartPointer<vtkLineSource>>> tube_lines;
-    std::vector<std::vector<vtkSmartPointer<vtkActor>>> tube_actors;
-    
-    // coordinate system for end-effector
-    vtkSmartPointer<vtkAxesActor> axes_ee;
-    vtkSmartPointer<vtkAxesActor> axes_base;
-    
-    // points per segment
-    int pts_per_seg;
-};
-
-
 // Class that implements the visualizer of the simulator using VTK
-class Visualizer
-{  
+class Visualizer{  
 	private:
 		vtkSmartPointer<vtkRenderer> mp_Ren;
 		vtkSmartPointer<vtkRenderWindow> mp_RenWin;
-		
-		vtkSmartPointer<vtkActor> mp_cubeActor;
-		
-		CTCRVis m_ctcrVis;
-		TDCRVis m_tdcrVis;
-		
-		
 		vtkSmartPointer<vtkAxesActor> mp_target_frame;
+        std::vector<vtkSmartPointer<vtkActor>> mp_curves;
 		
+        // Drawing Functions
+        void drawCurves(Eigen::MatrixXd curve, double rad);
+		void drawFrames(Eigen::MatrixXd frames);
+		void drawPoints(Eigen::MatrixXd points, double rad, char color);
 		
 	public:
+        // Init functions
 		Visualizer();
 		~Visualizer();
-				
-		void initScene(int assignment);
-		void update();
+
+        // Set Functions
+        
+        // Do functions
+            // Draw
+        void drawCath(Eigen::MatrixXd bb, double rad);
+		void drawAorta(Eigen::MatrixXd wall, double dead, double danger);
+        void update();
+        
+            // Clear
+        void clearCath();
+        void clearAorta();
 		void clear();
-		
-		// Draw and update a TDCR
-		void drawTDCR(int disks_per_seg, std::array<double,1> pradius_disks, double radius_disks, double ro, double height_disks);
-		void updateTDCR(Eigen::MatrixXd disk_frames);
-		void removeTDCR();
-		
-		// Draw and update a CTCR
-		void drawCTCR(int pts_per_seg, std::array<double,3> tube_radius);
-		void updateCTCR(Eigen::MatrixXd backbone_centerline, std::vector<int> tube_ind);
-		void removeCTCR();
-		
-		// Draw and move a cube (used for the test scneario)
-		void drawCube(Eigen::Vector3d pos, double scale);
-		void moveCube(Eigen::Vector2d dir);
-		
-		// Draw curves and frames along curves (used for the first assignment)
-		void drawCurve(Eigen::MatrixXd curve);
-		void drawFrames(Eigen::MatrixXd frames);
-		
-		// Draw target frame for control assignment
-		void drawTargetFrame(Eigen::Matrix4d frame);
-		void moveTargetFrame(Eigen::Matrix4d frame);
-		void removeTargetFrame();
-		
-		// Draw target path for control assignment
-		void drawPath(std::vector<Eigen::Matrix4d> path);
-		
-		vtkSmartPointer<vtkRenderWindow> getRenderWindow();
-		
+        
+        // Get Functions
+		vtkSmartPointer<vtkRenderWindow> g_renderWindow();
 };
