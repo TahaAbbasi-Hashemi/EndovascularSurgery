@@ -1,12 +1,24 @@
 #include <aorta.h>
 
+
+// Private Functions
+double Aorta::mg_distance(Eigen::Matrix4d point1, Eigen::Matrix4d point2){
+    Eigen::MatrixXd pos1 = point1.block<3, 1>(0, 3);
+    Eigen::MatrixXd pos2 = point2.block<3, 1>(0, 3);
+    Eigen::MatrixXd dist = pos2 - pos1;
+
+    double distNorm = dist.norm();
+    return distNorm;
+}
+
+
+// Public Functions
 Aorta::Aorta(){
-    m_deadD = 0;
-    m_dangerD = 0;
-    m_safeD = 0;
-    clear();
-    m_safety = 0;
-    m_maxD = 0;
+    m_deadD = -1;
+    m_dangerD = -1;
+
+    m_safety = -1;
+    m_distance = -1;
 }
 Aorta::~Aorta(){}
 
@@ -32,7 +44,8 @@ bool Aorta::s_points(Eigen::MatrixXd points){
 }
 
 bool Aorta::s_deadD(double deadD){
-    if (0 <= deadD <= 1){
+    double deadMax = 2;
+    if (0 <= deadD <= deadMax){
         m_deadD = deadD;
         return true;
     }else{
@@ -41,15 +54,13 @@ bool Aorta::s_deadD(double deadD){
     return false;
 }
 bool Aorta::s_dangerD(double dangerD){
-    if (m_deadD <= dangerD <= 1){
+    double dangerMax = 2;
+    if (m_deadD <= dangerD <= dangerMax){
         m_dangerD = dangerD;
         return true;
     }else{
         std::cout << "Bad value for dangerD with a value of " << dangerD << std::endl;
     }
-    return false;
-}
-bool Aorta::s_safeD(double safeD){
     return false;
 }
 
@@ -63,18 +74,20 @@ void Aorta::clear(){
 }
 void Aorta::checkDistance(Eigen::Matrix4d ee){
     // Reset parameters
-    m_maxD = 10000;
+    m_distance = 10000;
     m_safety = 1;
 
     // Find new parameters
     for (int i=0; i<m_points.cols()/4; i++){
         Eigen::Matrix4d currentFrame = m_points.block(0,4*i,4,4);
-        double dist = abs(differance(ee, currentFrame));
+        double dist = abs(mg_distance(ee, currentFrame));
 
         // Create the new minium value.
-        if (dist < m_maxD){ m_maxD = dist; }
+        if (dist < m_distance){ m_distance = dist; }
+
         // In this case we are at the worst position posible no need to continue.
         if (m_safety == -1){ break; }
+        
         if(dist <= m_deadD){
             m_safety = -1;
         }else if (dist <= m_dangerD){
@@ -87,7 +100,7 @@ void Aorta::checkDistance(Eigen::Matrix4d ee){
 // Getting Functions
 Eigen::MatrixXd Aorta::g_points(){return m_points;}
 int Aorta::g_safety(){return m_safety;}
-double Aorta::g_maxDist(){return m_maxD;}
+double Aorta::g_distance(){return m_distance;}
 
 
 

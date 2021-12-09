@@ -1,11 +1,3 @@
-/**
- * @file arota.h
- * TODO
- */
-
-// Include 
-#include <robot.h>
-
 //stl
 #include <cmath>
 #include <iostream>
@@ -14,27 +6,50 @@
 //Eigen
 #include <Eigen/Dense>
 
+/**
+ * The Aorta class contains a point cloud of the current Aorta Wall and can determine distance from a point to the point cloud. 
+ * 
+ * Dead means the Catheter/Object has reached a distance to the Aorta wall(point cloud) that can kill the patient. 
+ *
+ * Danger means the Catheter/Object is apporaching the Aorta Wall (point cloud)
+ *
+ * Safety classes are -1, 0, 1, 2
+ *
+ * -1 means something is misconfigured
+ * 0 means DEAD
+ * 1 means DANGER
+ * 2 means SAFE
+ */
 class Aorta{
     private:
-        double m_deadD; ///< idk something dois
-        double m_dangerD;
-        double m_safeD;
+        double m_deadD; ///< This sets the minimum distance an object can get to the Aorta.
+        double m_dangerD; ///< This sets the distance at which an object is considered close
         
         // For Checking
-        double m_maxD;
-        int m_safety;
+        double m_distance; ///< The smallest distance of the object to the vascular wall from the previous simulation
+        int m_safety; ///< The safety rating of the previous simulation
 
         // For Drawing
-        Eigen::MatrixXd m_points;
+        Eigen::MatrixXd m_points; ///< The points in the point cloud. 
+
+        /**
+         * Returns the distance between two points
+         *
+         * @param[in] point1
+         * @param[in] point2
+         * @param[out] double
+         */
+        double mg_distance(Eigen::Matrix4d point1, Eigen::Matrix4d point2);
 
     public:
-        // Initalize
+        // Construct and Deconstructor
         Aorta();
         ~Aorta();
 
         // Setting Functions
         /**
          * Adds a single point to the point cloud of the Aorta
+         *
          * @param[in] point
          * @param[out] True/False 
          *
@@ -44,6 +59,7 @@ class Aorta{
         bool s_point(Eigen::Matrix4d point);
         /**
          * Adds a group of points to the point cloud of the Aorta
+         *
          * @param[in] points
          * @param[out] True/False
          *
@@ -53,6 +69,7 @@ class Aorta{
         bool s_points(Eigen::MatrixXd points);
         /**
          * Sets the dead distance for the Aorta. The minimum distance something can come to the aorta.
+         *
          * @param[in] deadD
          * @param[out] True/False
          *
@@ -60,12 +77,24 @@ class Aorta{
          *      False if it falls outside the predefined acceptable range.
          */
         bool s_deadD(double deadD);
+        /**
+         * Sets the danger distance for the Aorta. A distance where an object is considered as unsafe or too close. 
+         * @param[in] deadD
+         * @param[out] True/False
+         *
+         *      True if the distance is within the predefined acceptable range.
+         *      False if it falls outside the predefined acceptable range.
+         */
         bool s_dangerD(double dangerD);
-        bool s_safeD(double safeD);
 
         // Doing Functions
         void clear();
-        /** does somthegn
+        /** 
+         * Runs a simulation to determine the safety of a given point and its closest distance to the Aortaic wall
+         *
+         * @param[in] Eigen::Matrix4d ee
+         *
+         *      The end effector point that is being tested against.
          */
         void checkDistance(Eigen::Matrix4d ee);
 
@@ -82,11 +111,11 @@ class Aorta{
          *      2 if the distance is greater than Danger Distance
          */
         int g_safety();
-        double g_maxDist();
+        double g_distance();
         /**
          * Returns the dead distance 
          *
-         * @param[out]
+         * @param[out] double
          *
          *      Returns -1 if s_deadD() has not yet returned true. 
          *      Returns deadD otherwise
@@ -95,7 +124,7 @@ class Aorta{
         /**
          * Returns the danger distance
          *
-         * @param[out]
+         * @param[out] double
          *      
          *      Returns -1 if s_dangerD() has not yet been called
          *      Returns dangerD otherwise
@@ -103,6 +132,8 @@ class Aorta{
         double g_dangerD();
         /**
          * Returns all points set by s_point() and s_points()
+         *
+         * @param[out] Eigen::MatrixXd
          */
         Eigen::MatrixXd g_points();
 };

@@ -1,8 +1,6 @@
 #define _USE_MATH_DEFINES
 #pragma once
 
-#include "robot.h"
-
 //stl
 #include <cmath>
 #include <iostream>
@@ -12,17 +10,17 @@
 #include <Eigen/Dense>
 
 // A catheter has the functionality of a TDCR but is drawn as if it is a CTCR
-class Catheter
-{  
+class Catheter {  
 	private:
-        int m_nseg;
-        int m_nq;
-        int m_nqps;
-        int m_pps;
+        int m_nseg;     ///< number of segments
+        int m_nq;       ///< number of q values overall
+        int m_nqps;     ///< number of q values per segment
+        int m_pps;      ///< this is to determine how many points in a segment to be drawn
         double m_rad;
-        double m_bbLen;
+        double m_tendonRad; ///< The radius of the tendons for simulation
+        double m_bbLen; ///< The length of the catheter
+        double m_bbRad; ///< The radius of the catheter
 
-		
         double m_q1change;
         double m_q2change;
         double m_q3change;
@@ -34,7 +32,10 @@ class Catheter
 		Eigen::Matrix4d m_baseFrame;
 		Eigen::Matrix4d m_eeFrame;
 		Eigen::MatrixXd m_backbone;
-		
+
+        Eigen::MatrixXd arc2x(Eigen::Matrix4d base, Eigen::MatrixXd kappa, Eigen::MatrixXd length, Eigen::MatrixXd phi, int nSeg);
+        double mg_distance(Eigen::Matrix4d point1, Eigen::Matrix4d point2);
+
 	public:
         Catheter();
         ~Catheter();

@@ -66,9 +66,7 @@ void MainLoop::Execute(vtkObject *caller, unsigned long eventId, void *vtkNotUse
         // The simulation
         if(m_engaged){
             // Before doing anything we check to make sure we are in a safe place
-            m_aorta.checkDistance(m_cath.g_eeFrame());
-            int safety = m_aorta.g_safety();
-            double maxD = m_aorta.g_maxDist();
+            //m_aorta.checkDistance(m_cath.g_eeFrame());
 
             // Testing to see all possibilties
             std::vector<int> safetyRatings;
@@ -82,7 +80,7 @@ void MainLoop::Execute(vtkObject *caller, unsigned long eventId, void *vtkNotUse
                     m_cath.fkine(editQ);
                     m_aorta.checkDistance(m_cath.g_eeFrame());
                     safetyRatings.push_back(m_aorta.g_safety());
-                    distanceRatings.push_back(m_aorta.g_maxDist());
+                    distanceRatings.push_back(m_aorta.g_distance());
                     goalRatings.push_back(m_cath.g_distEE());
                     
                     // Reset back to original State
