@@ -50,14 +50,18 @@ class Catheter
         
         // Doing Functions
         void fkine(Eigen::MatrixXd q);
+
         
         // Getting Functions
+        double g_distEE();
         double g_rad();
         double g_q1change();
         double g_q2change();
         double g_q3change();
+        double g_qChange(int qkind);
         Eigen::MatrixXd g_q();
         Eigen::MatrixXd g_baseFrame();
         Eigen::Matrix4d g_eeFrame();
         Eigen::MatrixXd g_backbone();
+
 };

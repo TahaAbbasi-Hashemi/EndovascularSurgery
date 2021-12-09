@@ -22,6 +22,8 @@ Visualizer::Visualizer() {
     mp_Ren->GetActiveCamera()->SetPosition(0,0,150);
     mp_Ren->GetActiveCamera()->SetFocalPoint(0.05,0,0.05);  
     mp_Ren->GetActiveCamera()->SetViewUp(0,0,-1);     
+    //std::array<unsigned char, 3> blk{{0, 0, 0}};
+    //mp_colors->SetColor("Black", blk.data());
 }
 
 Visualizer::~Visualizer() {}
@@ -32,33 +34,10 @@ vtkSmartPointer<vtkRenderWindow> Visualizer::g_renderWindow() { return mp_RenWin
 
 
 void Visualizer::clear() { 
-    mp_Ren->RemoveAllViewProps(); }
-
-void Visualizer::drawCurves(Eigen::MatrixXd curve, double rad){
-    for(int i = 1; i < curve.cols()/4; i++){
-        Eigen::Matrix4d cur_frame;
-        cur_frame = curve.block(0,4*i,4,4);
-        Eigen::Matrix4d prev_frame;
-        prev_frame = curve.block(0,4*(i-1),4,4);
-
-        vtkSmartPointer<vtkLineSource> line = vtkSmartPointer<vtkLineSource>::New();
-        line->SetPoint1(prev_frame(0,3),prev_frame(1,3),prev_frame(2,3));
-        line->SetPoint2(cur_frame(0,3),cur_frame(1,3),cur_frame(2,3));
-
-        vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-        tubeFilter->SetInputConnection(line->GetOutputPort());
-        tubeFilter->SetRadius(rad);                               // RADIUS
-        tubeFilter->SetNumberOfSides(50);                           // NUmber of sides
-
-        vtkSmartPointer<vtkPolyDataMapper> curveMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        curveMapper->SetInputConnection(tubeFilter->GetOutputPort());
-        vtkSmartPointer<vtkActor> curveActor = vtkSmartPointer<vtkActor>::New();
-        curveActor->SetMapper(curveMapper);
-        curveActor->GetProperty()->SetColor(0.9,0.9,0.9);
-        mp_curves.push_back(curveActor);
-        mp_Ren->AddActor(curveActor);
-    }
+    clearCath();
+    clearAorta();
 }
+    //mp_Ren->RemoveAllViewProps(); }
 
 
 void Visualizer::drawFrames(Eigen::MatrixXd frames){
@@ -81,6 +60,7 @@ void Visualizer::drawFrames(Eigen::MatrixXd frames){
 		frame->SetUserMatrix(ee_frame_vtk);
 		
 		mp_Ren->AddActor(frame);
+        //m_frameActors.push_back(frame);
 	}
 }
 
@@ -102,40 +82,92 @@ void Visualizer::drawPoints(Eigen::MatrixXd points, double rad, char color){
         // Visual Parameters
         mapper->SetInputConnection(sphereSource->GetOutputPort());
         actor->SetMapper(mapper);
-        if (color == 'h'){
-            actor->GetProperty()->SetColor(0.5, 0.5, 0.5);
-            actor->GetProperty()->SetOpacity(0.9);
-        }else if (color == 'g'){
-            actor->GetProperty()->SetColor(0.0, 0.5, 0.0);
-            actor->GetProperty()->SetOpacity(0.1);
-        }else if (color == 'r'){
-            actor->GetProperty()->SetColor(0.5, 0.0, 0.0);
-            actor->GetProperty()->SetOpacity(0.1);
-        }
+        actor->GetProperty()->SetOpacity(0.1);
+        //actor->GetProperty()->SetColor(mp_colors->GetColor3d("Black").GetData());
+        
         mp_Ren->AddActor(actor);
+    }
+}
+
+void Visualizer::drawSphere(Eigen::MatrixXd points, std::vector<vtkSmartPointer<vtkActor>> &actors, double rad, std::vector<double> color, double trans){
+    for(int i = 1; i < points.cols()/4; i++){
+        vtkSmartPointer<vtkSphereSource> source = vtkSmartPointer<vtkSphereSource>::New();
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+
+        // Shape Parameters
+        Eigen::Matrix4d curFrame;
+        curFrame = points.block(0,4*i,4,4);
+        source->SetCenter(curFrame(0,3), curFrame(1,3), curFrame(2,3));
+        source->SetRadius(rad);
+        source->SetPhiResolution(25);
+        source->SetThetaResolution(25);
+
+        // Visual Parameters
+        mapper->SetInputConnection(source->GetOutputPort());
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetOpacity(1);
+        actor->GetProperty()->SetOpacity(trans);
+        actor->GetProperty()->SetColor(color.at(0), color.at(1), color.at(2));
+
+        // Adding actor
+        mp_Ren->AddActor(actor);
+        actors.push_back(actor);
     }
 }
 
 
 // The user interacts with these only!!!
 void Visualizer::drawCath(Eigen::MatrixXd bb, double rad){
-    // Drawing Curves
+    // Clear
     clearCath();
-    drawCurves(bb, rad);
-    // Drawing start and End Frame
-    drawFrames(bb.leftCols(4));
-    drawFrames(bb.rightCols(4));
+
+    // Set Colors
+    std::vector<double> cathColor;
+    cathColor.push_back(0.5);
+    cathColor.push_back(0.5);
+    cathColor.push_back(0.5);
+
+    // Draw
+    drawSphere(bb, m_cathActors, 0.5, cathColor, 1);
 }
+
 void Visualizer::clearCath(){
-    for (int i=0;  i<mp_curves.size(); i++){
-        mp_Ren->RemoveActor(mp_curves.at(i));
+    for (int i=0; i<m_cathActors.size(); i++){
+        mp_Ren->RemoveActor(m_cathActors.at(i));
     }
-    mp_curves.clear();
+    m_cathActors.clear();
 }
 
 void Visualizer::drawAorta(Eigen::MatrixXd points, double dead, double danger){
-    drawPoints(points, dead, 'h');  // Point/Dead   (0.01mm)
-    drawPoints(points, danger, 'r');   // Danger       (0.5mm)
+    // CLear
+    clearAorta();
+
+    // Set Colors
+    std::vector<double> wallColor;
+    std::vector<double> dangerColor;
+    std::vector<double> deadColor;
+    
+    wallColor.push_back(0.5);
+    wallColor.push_back(0.5);
+    wallColor.push_back(0.5);
+    dangerColor.push_back(0.5);
+    dangerColor.push_back(0.1);
+    dangerColor.push_back(0.1);
+    deadColor.push_back(1);
+    deadColor.push_back(0);
+    deadColor.push_back(0);
+ 
+    // Take every 5th point instead
+    //drawSphere(points, m_aortaActors, 0.5, wallColor, 1);
+    drawSphere(points, m_aortaActors, danger, dangerColor, 0.02);
+    drawSphere(points, m_aortaActors, dead, deadColor, 1);
 }
 
-void Visualizer::clearAorta(){}
+
+void Visualizer::clearAorta(){
+    for (int i=0; i<m_aortaActors.size(); i++){
+        mp_Ren->RemoveActor(m_aortaActors.at(i));
+    }
+    m_aortaActors.clear();
+}

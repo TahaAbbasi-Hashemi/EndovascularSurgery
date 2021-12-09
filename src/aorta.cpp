@@ -64,15 +64,17 @@ void Aorta::clear(){
 void Aorta::checkDistance(Eigen::Matrix4d ee){
     // Reset parameters
     m_maxD = 10000;
-    m_safety = 1;// 10m
+    m_safety = 1;
 
     // Find new parameters
     for (int i=0; i<m_points.cols()/4; i++){
         Eigen::Matrix4d currentFrame = m_points.block(0,4*i,4,4);
         double dist = abs(differance(ee, currentFrame));
 
-        if (dist < m_maxD){ m_maxD = dist; }    // Set new max. 
-        if (m_safety == -1){ break; }  // Means we are already at the worst case situation.
+        // Create the new minium value.
+        if (dist < m_maxD){ m_maxD = dist; }
+        // In this case we are at the worst position posible no need to continue.
+        if (m_safety == -1){ break; }
         if(dist <= m_deadD){
             m_safety = -1;
         }else if (dist <= m_dangerD){

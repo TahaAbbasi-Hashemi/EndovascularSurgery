@@ -12,34 +12,28 @@
 #include <vtkSmartPointer.h>
 #include <vtkActor.h>
 #include <vtkAxesActor.h>
-#include <vtkSphereSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-#include <vtkTransform.h>
-#include <vtkLine.h>
-#include <vtkCellArray.h>
-#include <vtkTubeFilter.h>
-#include <vtkLineSource.h>
-#include <vtkOpenGLLight.h>
-#include <vtkCubeSource.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkGeometryFilter.h>
-#include <vtkCylinderSource.h>
-#include <vtkMatrix4x4.h>
-#include <vtkCamera.h>
-
-#include <vtkTriangle.h>
-#include <vtkActor.h>
-#include <vtkCellArray.h>
-#include <vtkNamedColors.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+#include <vtkCellArray.h>
+#include <vtkOpenGLLight.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkGeometryFilter.h>
+#include <vtkMatrix4x4.h>
+#include <vtkCamera.h>
+#include <vtkTubeFilter.h>
+
+// Shapes
+#include <vtkLine.h>
+#include <vtkLineSource.h>
 #include <vtkTriangle.h>
+#include <vtkCubeSource.h>
+#include <vtkSphereSource.h>
+#include <vtkCylinderSource.h>
+
+#include <vtkNamedColors.h>
+#include <vtkRenderWindowInteractor.h>
 
 //Eigen
 #include <Eigen/Dense>
@@ -50,12 +44,19 @@ class Visualizer{
 		vtkSmartPointer<vtkRenderer> mp_Ren;
 		vtkSmartPointer<vtkRenderWindow> mp_RenWin;
 		vtkSmartPointer<vtkAxesActor> mp_target_frame;
-        std::vector<vtkSmartPointer<vtkActor>> mp_curves;
+        vtkSmartPointer<vtkNamedColors> mp_colors; // This is giving me trouble look into it later
+        //std::vector<vtkSmartPointer<vtkActor>> mp_curves;
+        std::vector<vtkSmartPointer<vtkActor>> m_curveActors;
+        std::vector<vtkSmartPointer<vtkActor>> m_sphereActors;
+        std::vector<vtkSmartPointer<vtkActor>> m_frameActors;
+        std::vector<vtkSmartPointer<vtkActor>> m_cathActors;
+        std::vector<vtkSmartPointer<vtkActor>> m_aortaActors;
 		
         // Drawing Functions
         void drawCurves(Eigen::MatrixXd curve, double rad);
 		void drawFrames(Eigen::MatrixXd frames);
 		void drawPoints(Eigen::MatrixXd points, double rad, char color);
+        void drawSphere(Eigen::MatrixXd points, std::vector<vtkSmartPointer<vtkActor>> &actors, double rad, std::vector<double> color, double trans);
 		
 	public:
         // Init functions
