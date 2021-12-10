@@ -1,7 +1,6 @@
 // includes
 #include <mainloop.h>
 #include <visualizer.h>
-#include <robot.h>
 
 // stl
 #include <array>
@@ -16,9 +15,15 @@
 // Eigen
 #include <Eigen/Dense>
 
+#include <boost/asio.hpp>
+
 int main(int argc, char **argv) {
     if (argc == 1) {} // We got not input
    // if (strcmp(scen, "a1") == 0) {}
+
+    //boost::asio::io_service ioservice;
+    //boost::asio::serial_port serial(ioservice, "/dev/ttyACM0");
+    //std::cout<< "/dev/ttyACM0\n";
 
     Visualizer vis;
     MainLoop eventLoop(vis); // Makes a loop called event loop
@@ -40,3 +45,4 @@ int main(int argc, char **argv) {
 
     return 1;
 }
+

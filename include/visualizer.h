@@ -1,7 +1,5 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-
 //stl
 #include <vector>
 #include <array>
@@ -11,40 +9,42 @@
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
 #include <vtkActor.h>
-#include <vtkAxesActor.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkAxesActor.h>   // unused
+#include <vtkPolyData.h>    // unused
+#include <vtkPolyDataMapper.h>  // unused
 #include <vtkProperty.h>
-#include <vtkTransform.h>
-#include <vtkCellArray.h>
-#include <vtkOpenGLLight.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkGeometryFilter.h>
-#include <vtkMatrix4x4.h>
+#include <vtkTransform.h>       // unused
+#include <vtkCellArray.h>       // unused
+#include <vtkOpenGLLight.h>    
+#include <vtkUnstructuredGrid.h>    //unused
+#include <vtkGeometryFilter.h>      // unused
+#include <vtkMatrix4x4.h>       // ???
 #include <vtkCamera.h>
-#include <vtkTubeFilter.h>
+#include <vtkTubeFilter.h>      // removed need for.
 
 // Shapes
 #include <vtkLine.h>
 #include <vtkLineSource.h>
-#include <vtkTriangle.h>
-#include <vtkCubeSource.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
+#include <vtkTriangle.h>    // unused
+#include <vtkCubeSource.h>  // unused
+#include <vtkSphereSource.h>    
+#include <vtkCylinderSource.h>  // unused
 
-#include <vtkNamedColors.h>
+#include <vtkNamedColors.h>     // Can not figure out how to use.
 #include <vtkRenderWindowInteractor.h>
 
 //Eigen
 #include <Eigen/Dense>
 
-// Class that implements the visualizer of the simulator using VTK
+/**
+ * This class is all about drawing the simulation 
+ *
+ * This functions that should only be called from this class are the drawing and clearing functions. 
+ */
 class Visualizer{  
 	private:
 		vtkSmartPointer<vtkRenderer> mp_Ren;
 		vtkSmartPointer<vtkRenderWindow> mp_RenWin;
-		vtkSmartPointer<vtkAxesActor> mp_target_frame;
-        vtkSmartPointer<vtkNamedColors> mp_colors; // This is giving me trouble look into it later
         //std::vector<vtkSmartPointer<vtkActor>> mp_curves;
         std::vector<vtkSmartPointer<vtkActor>> m_curveActors;
         std::vector<vtkSmartPointer<vtkActor>> m_sphereActors;
@@ -60,22 +60,44 @@ class Visualizer{
 		
 	public:
         // Init functions
-		Visualizer();
-		~Visualizer();
+		Visualizer(); ///< Constructor
+		~Visualizer();///< Deconstructor
 
         // Set Functions
         
         // Do functions
             // Draw
+        /**
+         * This function draws a catheter given the backbone radius and the backbone points. 
+         *
+         * @param[in] bb 
+         *      This is the points across the backbone of the catheter. 
+         * @param[in] rad
+         *      This is the radius of the backbone. 
+         */
         void drawCath(Eigen::MatrixXd bb, double rad);
+
+        /**
+         * This function draws the Aorta using a point cloud. 
+         *
+         * The aorta is made up of several spheres, and each sphere is drawn multiple times. 
+         * The first is the dead zone which is a dark color. The second is a danger zone which is transparent. 
+         * @param[in] wall
+         *      The points of the aorta cloud. 
+         * @param[in] dead
+         *      The radius of the dead zone
+         * @param[in] danger
+         *      The radius of the danger zone
+         */
 		void drawAorta(Eigen::MatrixXd wall, double dead, double danger);
-        void update();
+        void update(); ///< updates the visualizer system.
         
             // Clear
-        void clearCath();
-        void clearAorta();
-		void clear();
+        void clearCath();   ///< Removes the catheter from the visualizer system. 
+        void clearAorta();  ///< Removes the Aorta from the visualizer system.
+		void clear();       ///< Removes everything from the visualizer system.
         
         // Get Functions
-		vtkSmartPointer<vtkRenderWindow> g_renderWindow();
+		vtkSmartPointer<vtkRenderWindow> g_renderWindow(); ///< Returns the render window.
 };
+

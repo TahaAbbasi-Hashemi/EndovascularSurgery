@@ -1,3 +1,5 @@
+#pragma once
+
 //stl
 #include <cmath>
 #include <iostream>
