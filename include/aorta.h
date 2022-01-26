@@ -113,6 +113,14 @@ class Aorta{
          *      2 if the distance is greater than Danger Distance
          */
         int g_safety();
+        /**
+         * Returns thi distance between the vascular wall and the catheter end effector
+         *
+         * @param[out] double
+         *      
+         *      Returns -1 if checkDistance() hasnt been run yet
+         *      Returns distance otherwise.
+         */
         double g_distance();
         /**
          * Returns the dead distance 

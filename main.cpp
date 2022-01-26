@@ -1,5 +1,6 @@
 // includes
 #include <mainloop.h>
+#include <qlearning.h>
 #include <visualizer.h>
 
 // stl
@@ -15,10 +16,11 @@
 // Eigen
 #include <Eigen/Dense>
 
+// Boost
 #include <boost/asio.hpp>
 
 int main(int argc, char **argv) {
-    if (argc == 1) {} // We got not input
+    if (argc >= 1) {}
    // if (strcmp(scen, "a1") == 0) {}
 
     //boost::asio::io_service ioservice;
@@ -26,13 +28,15 @@ int main(int argc, char **argv) {
     //std::cout<< "/dev/ttyACM0\n";
 
     Visualizer vis;
-    MainLoop eventLoop(vis); // Makes a loop called event loop
+    MainLoop eventLoop(vis);
 
     // Turn off warning messages to prevent them from spamming the terminal
     vtkObject::GlobalWarningDisplayOff();
+    
     // Create Window Interactor
     vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     renderWindowInteractor->SetRenderWindow(vis.g_renderWindow());
+    
     // Set up and start main loop
     renderWindowInteractor->UpdateSize(1200, 700);
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();

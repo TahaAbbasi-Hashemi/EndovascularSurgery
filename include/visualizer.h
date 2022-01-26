@@ -33,6 +33,10 @@
 #include <vtkNamedColors.h>     // Can not figure out how to use.
 #include <vtkRenderWindowInteractor.h>
 
+// For importing STL 
+#include <vtkImporter.h>
+#include <vtkSTLReader.h>
+
 //Eigen
 #include <Eigen/Dense>
 
@@ -45,6 +49,7 @@ class Visualizer{
 	private:
 		vtkSmartPointer<vtkRenderer> mp_Ren;
 		vtkSmartPointer<vtkRenderWindow> mp_RenWin;
+        vtkSmartPointer<vtkRenderWindowInteractor> mp_renWinINt;
         //std::vector<vtkSmartPointer<vtkActor>> mp_curves;
         std::vector<vtkSmartPointer<vtkActor>> m_curveActors;
         std::vector<vtkSmartPointer<vtkActor>> m_sphereActors;
@@ -91,6 +96,8 @@ class Visualizer{
          */
 		void drawAorta(Eigen::MatrixXd wall, double dead, double danger);
         void update(); ///< updates the visualizer system.
+
+        void drawSTL();
         
             // Clear
         void clearCath();   ///< Removes the catheter from the visualizer system. 

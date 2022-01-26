@@ -5,7 +5,7 @@ Catheter::Catheter(){
     m_nq = 0;
     m_pps = 0;
     m_rad = 0;
-    //m_q1change = 0.0005;
+ 
     m_q1change = 0.02;
     m_q2change = M_PI/12;
     m_q3change = 5;

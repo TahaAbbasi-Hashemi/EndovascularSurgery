@@ -5,6 +5,8 @@ Visualizer::Visualizer() {
 	mp_Ren = vtkSmartPointer<vtkRenderer>::New();
 	mp_RenWin = vtkSmartPointer<vtkRenderWindow>::New();
 	mp_RenWin->AddRenderer(mp_Ren);
+    //mp_renWinInt = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    //mp_renWinInt->SetRenderWindow(mp_RenWin);
 
     // General settings
     mp_Ren->SetBackground(1,1,1);
@@ -19,9 +21,9 @@ Visualizer::Visualizer() {
     mp_Ren->AddLight(sceneLight);
     
 	//Camera
-    mp_Ren->GetActiveCamera()->SetPosition(0,0,150);
-    mp_Ren->GetActiveCamera()->SetFocalPoint(0.05,0,0.05);  
-    mp_Ren->GetActiveCamera()->SetViewUp(0,0,-1);     
+    //mp_Ren->GetActiveCamera()->SetPosition(0,0,150);
+    //mp_Ren->GetActiveCamera()->SetFocalPoint(0.05,0,0.05);  
+    //mp_Ren->GetActiveCamera()->SetViewUp(0,0,-1);     
     //std::array<unsigned char, 3> blk{{0, 0, 0}};
     //mp_colors->SetColor("Black", blk.data());
 }
@@ -109,6 +111,9 @@ void Visualizer::drawSphere(Eigen::MatrixXd points, std::vector<vtkSmartPointer<
         actor->GetProperty()->SetOpacity(1);
         actor->GetProperty()->SetOpacity(trans);
         actor->GetProperty()->SetColor(color.at(0), color.at(1), color.at(2));
+        actor->GetProperty()->SetDiffuse(0.8);
+        actor->GetProperty()->SetSpecular(0.3);
+        actor->GetProperty()->SetSpecularPower(60);
 
         // Adding actor
         mp_Ren->AddActor(actor);
@@ -162,6 +167,33 @@ void Visualizer::drawAorta(Eigen::MatrixXd points, double dead, double danger){
     //drawSphere(points, m_aortaActors, 0.5, wallColor, 1);
     drawSphere(points, m_aortaActors, danger, dangerColor, 0.02);
     drawSphere(points, m_aortaActors, dead, deadColor, 1);
+
+
+
+/*
+    std::string file = "/home/taha/Development/Cpp/EndovascularSurgery/Aorta.stl";
+    vtkSmartPointer<vtkSTLReader> reader = vtkSmartPointer<vtkSTLReader>::New();
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    
+    std::cout << "DID this\n";
+    reader->SetFileName(file.c_str());
+    reader->Update();
+
+        // Visual Parameters
+    mapper->SetInputConnection(reader->GetOutputPort());
+    actor->SetMapper(mapper);
+
+    actor->GetProperty()->SetDiffuse(0.8);
+    actor->GetProperty()->SetSpecular(0.3);
+    actor->GetProperty()->SetSpecularPower(60);
+    //Set Position??
+
+    std::cout << "DID this\n";
+    
+    mp_Ren->AddActor(actor);
+    //actors.push_back(actor);
+    */
 }
 
 

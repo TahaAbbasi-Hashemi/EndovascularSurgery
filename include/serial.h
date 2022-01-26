@@ -16,7 +16,7 @@ class Serial{
         ~Serial();
 
         // Setting Functions
-        void s_default();
+        void s_default();                   ///< sets everything to default. 
         bool s_portName(std::string port);
         bool s_baudRate(int rate);
         bool s_parity(int parity);
@@ -29,4 +29,3 @@ class Serial{
         // Getting Functions
         std::string g_data();
 }
-
